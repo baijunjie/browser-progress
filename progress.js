@@ -1,8 +1,8 @@
 /*!
- * Pseudo progress v0.9
+ * Pseudo progress v0.9.1
  * @author baijunjie
  *
- * https://github.com/baijunjie/progress
+ * https://github.com/baijunjie/progress.js
  */
 (function(root, factory) {
 	"use strict";
@@ -172,7 +172,7 @@
 		this.hideDuration = 400; // 进程隐藏的持续时间
 		this.coeStep1 = .05;
 		this.coeStep2 = .01;
-		this.coeStep3 = .3;
+		this.coeStep3 = .2;
 		this.valueStep1 = 70;
 		this.valueStep2 = 95;
 		this.valueStep3 = 100;
@@ -182,6 +182,7 @@
 		this.coe = 1;
 		this.isRun = false;
 		this.isShow = false;
+		this.timerID = -1; // 用于记录hide动画使用的计时器ID
 
 		this.loop = new Loop();
 		this._init();
@@ -238,7 +239,7 @@
 		},
 
 		_loadedHandle: function() {
-			this.finish();
+			this.done();
 			this._removeLoadEvent();
 		},
 
@@ -260,7 +261,7 @@
 			var v = this.value,
 				d = this.targetValue - v,
 				t = d * this.coe;
-			if (d > .1) {
+			if (Math.abs(d) > .1) {
 				v += t;
 				this._set(v);
 			} else {
@@ -275,14 +276,14 @@
 			}
 		},
 
-		_hide: function() {
+		_hide: function(animate) {
 			if (!this.isShow) return;
 			this.isShow = false;
-			if (support.transition) {
+			if (animate && support.transition) {
 				this._css(this.progress, "opacity", 0);
 				this._css(this.progress, support.transition, "opacity " + this.hideDuration + "ms");
 				var _this = this;
-				window.setTimeout(function() {
+				this.timerID = window.setTimeout(function() {
 					_this._css(_this.progress, "display", "none");
 					_this._css(_this.progress, support.transition, "");
 				}, this.hideDuration);
@@ -295,6 +296,7 @@
 		_show: function() {
 			if (this.isShow) return;
 			this.isShow = true;
+			window.clearTimeout(this.timerID);
 			this._css(this.progress, {
 				"display": "block",
 				"opacity": 1
@@ -325,8 +327,10 @@
 				this._css(this.progressBar, "right", (100 - value) + "%");
 			}
 
-			if (value === this.valueStep3) {
-				this._hide();
+			if (value === 0 || value === this.valueStep3) {
+				this._hide(value);
+			} else {
+				this._show();
 			}
 			return this;
 		},
@@ -338,9 +342,18 @@
 		},
 
 		set: function(value) {
-			this._show();
 			this.stop();
 			value = Math.max(0, Math.min(100, value));
+			if (value < this.valueStep1) {
+				this.coe = this.coeStep1;
+				this.targetValue = this.valueStep1;
+			} else if (value < this.valueStep2) {
+				this.coe = this.coeStep2;
+				this.targetValue = this.valueStep2;
+			} else if (value < this.valueStep3) {
+				this.coe = this.coeStep3;
+				this.targetValue = this.valueStep3;
+			}
 			this._set(value);
 			return this;
 		},
@@ -355,16 +368,6 @@
 		play: function() {
 			if (this.isRun) return this;
 			this.isRun = true;
-			if (this.value < this.valueStep1) {
-				this.coe = this.coeStep1;
-				this.targetValue = this.valueStep1;
-			} else if (this.value < this.valueStep2) {
-				this.coe = this.coeStep2;
-				this.targetValue = this.valueStep2;
-			} else if (this.value < this.valueStep3) {
-				this.coe = this.coeStep3;
-				this.targetValue = this.valueStep3;
-			}
 			this.loop.add(this._run, this);
 			return this;
 		},
@@ -374,14 +377,22 @@
 				this._removeLoadEvent();
 			}
 			this._set(0);
-			this._show();
+			this.coe = this.coeStep1;
+			this.targetValue = this.valueStep1;
 			this.play();
 			return this;
 		},
 
-		finish: function() {
+		done: function() {
 			this.coe = this.coeStep3;
 			this.targetValue = this.valueStep3;
+			this.play();
+			return this;
+		},
+
+		fail: function() {
+			this.coe = this.coeStep3;
+			this.targetValue = 0;
 			this.play();
 			return this;
 		}

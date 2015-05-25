@@ -33,10 +33,12 @@ bjj.progress.play(); // 恢复运行进程
 
 bjj.progress.start(); // 重新开始进程
 
-bjj.progress.finish(); // 完成进程
+bjj.progress.done(); // 完成进程
+
+bjj.progress.fail(); // 进程回零，一般用于加载失败
 ```
 
-如果使用 Ajax 更新页面内容，可以调用 .start() 方法重新开始进程，然后在 Ajax 的完成回调中调用 .finish() 方法完成进程。<br>
+如果使用 Ajax 更新页面内容，可以调用 .start() 方法重新开始进程，然后在 Ajax 的完成回调中调用 .done() 方法完成进程。<br>
 
 注意，如果页面还未触发 load 事件，那么此时调用 .start() 会将 load 事件监听移除，为的是不让 load 影响新的进程。
 
