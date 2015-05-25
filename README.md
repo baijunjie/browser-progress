@@ -5,7 +5,8 @@
 
 ## Usage
 
-将 [progress.js] 引在 \<body\> 标签之后。默认情况下 progress 会监听页面的 load 事件，当 load 事件触发时，进度条完成。
+将 [progress.js] 引在 \<body\> 标签之后。<br>
+默认情况下 progress 会监听页面的 load 事件，当 load 事件触发时，进度条完成。
 
 ``` html
 <body>
@@ -24,14 +25,20 @@
 ``` js
 bjj.progress.color(#000); // 修改进度条颜色
 
-bjj.progress.stop(); //	进度条暂停
+bjj.progress.set(50); // 设置进程的当前值，取值为 0~100。同时会暂停运行中的进程，使进程变为手动设置
 
-bjj.progress.play(); // 进度条恢复运行
+bjj.progress.stop(); //	暂停进程
 
-bjj.progress.start(); // 进度条重新开始
+bjj.progress.play(); // 恢复运行进程
 
-bjj.progress.finish(); // 进度条完成
+bjj.progress.start(); // 重新开始进程
+
+bjj.progress.finish(); // 完成进程
 ```
+
+如果使用 Ajax 更新页面内容，可以调用 .start() 方法重新开始进程，然后在 Ajax 的完成回调中调用 .finish() 方法完成进程。<br>
+
+注意，如果页面还未触发 load 事件，那么此时调用 .start() 会将 load 事件监听移除，为的是不让 load 影响新的进程。
 
 
 

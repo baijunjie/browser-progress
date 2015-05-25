@@ -169,10 +169,20 @@
 	}
 
 	function Progress(color) {
+		this.hideDuration = 400; // 进程隐藏的持续时间
+		this.coeStep1 = .05;
+		this.coeStep2 = .01;
+		this.coeStep3 = .3;
+		this.valueStep1 = 70;
+		this.valueStep2 = 95;
+		this.valueStep3 = 100;
+
 		this.value = 0;
-		this.targetValue = 70;
-		this.coe = .05;
+		this.targetValue = 100;
+		this.coe = 1;
 		this.isRun = false;
+		this.isShow = false;
+
 		this.loop = new Loop();
 		this._init();
 		this.color(color || "#2299dd");
@@ -191,7 +201,7 @@
 			this.progressInner = document.createElement("div");
 
 			this._css(this.progress, {
-				"display": "block",
+				"display": "none",
 				"opacity": 1,
 				"-webkit-pointer-events": "none",
 				"pointer-events": "none",
@@ -255,9 +265,9 @@
 				this._set(v);
 			} else {
 				this._set(this.targetValue);
-				if (this.targetValue === 70) {
-					this.coe = .01;
-					this.targetValue = 95;
+				if (this.targetValue === this.valueStep1) {
+					this.coe = this.coeStep2;
+					this.targetValue = this.valueStep2;
 				} else {
 					this.isRun = false;
 					return false;
@@ -266,14 +276,16 @@
 		},
 
 		_hide: function() {
+			if (!this.isShow) return;
+			this.isShow = false;
 			if (support.transition) {
 				this._css(this.progress, "opacity", 0);
-				this._css(this.progress, support.transition, "opacity 400ms");
+				this._css(this.progress, support.transition, "opacity " + this.hideDuration + "ms");
 				var _this = this;
 				window.setTimeout(function() {
 					_this._css(_this.progress, "display", "none");
 					_this._css(_this.progress, support.transition, "");
-				}, 400);
+				}, this.hideDuration);
 			} else {
 				this._css(this.progress, "display", "none");
 			}
@@ -281,6 +293,8 @@
 		},
 
 		_show: function() {
+			if (this.isShow) return;
+			this.isShow = true;
 			this._css(this.progress, {
 				"display": "block",
 				"opacity": 1
@@ -311,7 +325,7 @@
 				this._css(this.progressBar, "right", (100 - value) + "%");
 			}
 
-			if (value === 100) {
+			if (value === this.valueStep3) {
 				this._hide();
 			}
 			return this;
@@ -324,6 +338,7 @@
 		},
 
 		set: function(value) {
+			this._show();
 			this.stop();
 			value = Math.max(0, Math.min(100, value));
 			this._set(value);
@@ -340,6 +355,16 @@
 		play: function() {
 			if (this.isRun) return this;
 			this.isRun = true;
+			if (this.value < this.valueStep1) {
+				this.coe = this.coeStep1;
+				this.targetValue = this.valueStep1;
+			} else if (this.value < this.valueStep2) {
+				this.coe = this.coeStep2;
+				this.targetValue = this.valueStep2;
+			} else if (this.value < this.valueStep3) {
+				this.coe = this.coeStep3;
+				this.targetValue = this.valueStep3;
+			}
 			this.loop.add(this._run, this);
 			return this;
 		},
@@ -348,8 +373,6 @@
 			if (this.listenerLoad) {
 				this._removeLoadEvent();
 			}
-			this.coe = .05;
-			this.targetValue = 70;
 			this._set(0);
 			this._show();
 			this.play();
@@ -357,8 +380,8 @@
 		},
 
 		finish: function() {
-			this.coe = .3;
-			this.targetValue = 100;
+			this.coe = this.coeStep3;
+			this.targetValue = this.valueStep3;
 			this.play();
 			return this;
 		}
