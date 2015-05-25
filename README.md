@@ -5,7 +5,7 @@
 
 ## Usage
 
-将 [progress.js] 引在 \<body\> 标签之后。默认情况加，progress 会监听页面的 load 事件，当
+将 [progress.js] 引在 \<body\> 标签之后。默认情况下 progress 会监听页面的 load 事件，当 load 事件触发时，进度条完成。
 
 ``` html
 <body>
@@ -15,11 +15,11 @@
 </body>
 
 ```
-[progress.js]: https://github.com/baijunjie/progress/blob/master/progress.js
+[progress.js]: https://github.com/baijunjie/progress.js/blob/master/progress.js
 
 ## API
 
-如果过不通过模块化加载，那么可以通过全局对象 bjj.progress 进行调用
+如果过不通过模块化加载，那么可以通过全局对象 bjj.progress 进行调用。
 
 ``` js
 bjj.progress.color(#000); // 修改进度条颜色
