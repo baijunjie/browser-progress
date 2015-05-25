@@ -1,7 +1,7 @@
 ﻿# progress.js
 
 一款小巧的伪进度条插件，会在页面顶部伪装一个进度条，就好像 [YouTube](https://www.youtube.com/) 正在使用的那种。<br>
-支持 IE6-8 等老式浏览器
+支持 IE6-8 等老式浏览器。
 
 ## Usage
 
