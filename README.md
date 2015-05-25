@@ -23,7 +23,7 @@
 如果不通过模块化加载，那么可以通过全局对象 bjj.progress 进行调用。
 
 ``` js
-bjj.progress.color(#000); // 修改进度条颜色
+bjj.progress.color("#000"); // 修改进度条颜色
 
 bjj.progress.set(50); // 设置进程的当前值，取值为 0~100。同时会暂停运行中的进程，使进程变为手动设置
 
