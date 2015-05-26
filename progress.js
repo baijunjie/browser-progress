@@ -82,7 +82,7 @@
 		this.runFunc = []; //储存所有主循环中运行的方法
 		this.loopRun = false; //表示循环是否已经运行（只要 runFunc 中有需要运行的方法，即使已经 stop，也视为运行状态）
 		this.isStop = false; //表示循环是否暂停
-		this.timerID = -1;
+		this.timerID = 0;
 		this._loopCallback = proxy(this._loopCallback, this);
 	}
 
@@ -172,17 +172,19 @@
 		this.hideDuration = 400; // 进程隐藏的持续时间
 		this.coeStep1 = .05;
 		this.coeStep2 = .01;
-		this.coeStep3 = .2;
+		this.coeStep3 = .3;
+		this.coeStep4 = .1;
 		this.valueStep1 = 70;
 		this.valueStep2 = 95;
 		this.valueStep3 = 100;
+		this.valueStep4 = 0;
 
 		this.value = 0;
 		this.targetValue = 100;
 		this.coe = 1;
 		this.isRun = false;
 		this.isShow = false;
-		this.timerID = -1; // 用于记录hide动画使用的计时器ID
+		this.timerID = 0; // 用于记录hide动画使用的计时器ID
 
 		this.loop = new Loop();
 		this._init();
@@ -286,6 +288,7 @@
 				this.timerID = window.setTimeout(function() {
 					_this._css(_this.progress, "display", "none");
 					_this._css(_this.progress, support.transition, "");
+					this.timerID = 0;
 				}, this.hideDuration);
 			} else {
 				this._css(this.progress, "display", "none");
@@ -296,7 +299,12 @@
 		_show: function() {
 			if (this.isShow) return;
 			this.isShow = true;
-			window.clearTimeout(this.timerID);
+
+			if (this.timerID > 0) {
+				window.clearTimeout(this.timerID);
+				this._css(this.progress, support.transition, "");
+			}
+
 			this._css(this.progress, {
 				"display": "block",
 				"opacity": 1
@@ -391,8 +399,8 @@
 		},
 
 		fail: function() {
-			this.coe = this.coeStep3;
-			this.targetValue = 0;
+			this.coe = this.coeStep4;
+			this.targetValue = this.valueStep4;
 			this.play();
 			return this;
 		}
