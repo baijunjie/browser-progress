@@ -272,6 +272,9 @@
 					this.coe = this.coeStep2;
 					this.targetValue = this.valueStep2;
 				} else {
+					if (this.targetValue === this.valueStep3 || this.targetValue === this.valueStep4) {
+						this._hide(this.targetValue);
+					}
 					this.isRun = false;
 					return false;
 				}
@@ -288,10 +291,12 @@
 				this.timerID = window.setTimeout(function() {
 					_this._css(_this.progress, "display", "none");
 					_this._css(_this.progress, support.transition, "");
-					this.timerID = 0;
+					_this._set(0);
+					_this.timerID = 0;
 				}, this.hideDuration);
 			} else {
 				this._css(this.progress, "display", "none");
+				this._set(0);
 			}
 			return this;
 		},
@@ -303,6 +308,8 @@
 			if (this.timerID > 0) {
 				window.clearTimeout(this.timerID);
 				this._css(this.progress, support.transition, "");
+				this._set(0);
+				this.timerID = 0;
 			}
 
 			this._css(this.progress, {
@@ -334,12 +341,6 @@
 			} else {
 				this._css(this.progressBar, "right", (100 - value) + "%");
 			}
-
-			if (value === 0 || value === this.valueStep3) {
-				this._hide(value);
-			} else {
-				this._show();
-			}
 			return this;
 		},
 
@@ -363,6 +364,11 @@
 				this.targetValue = this.valueStep3;
 			}
 			this._set(value);
+			if (value === this.valueStep3 || value === this.valueStep4) {
+				this._hide(value);
+			} else {
+				this._show();
+			}
 			return this;
 		},
 
@@ -387,6 +393,7 @@
 			this._set(0);
 			this.coe = this.coeStep1;
 			this.targetValue = this.valueStep1;
+			this._show();
 			this.play();
 			return this;
 		},
