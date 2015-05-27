@@ -1,5 +1,5 @@
 /*!
- * Pseudo progress v0.9.1
+ * Pseudo progress v0.9.2
  * @author baijunjie
  *
  * https://github.com/baijunjie/progress.js
@@ -237,7 +237,17 @@
 
 			this.progressBar.appendChild(this.progressInner);
 			this.progress.appendChild(this.progressBar);
-			document.body.appendChild(this.progress);
+
+			this._addDocument = proxy(this._addDocument, this);
+			this._addDocument();
+		},
+
+		_addDocument: function() {
+			if (document.body) {
+				document.body.appendChild(this.progress);
+			} else {
+				window.setTimeout(this._addDocument);
+			}
 		},
 
 		_loadedHandle: function() {
