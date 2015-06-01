@@ -213,7 +213,9 @@
 				"position": "fixed",
 				"top": 0,
 				"z-index": 99999,
-				"width": "100%"
+				"width": "100%",
+				"height": "10px",
+				"overflow": "hidden"
 			});
 
 			this._css(this.progressBar, {
@@ -352,6 +354,11 @@
 			return this;
 		},
 
+		appendTo: function(elem, style) {
+			elem.appendChild(this.progress);
+			this._css(this.progress, style);
+		},
+
 		color: function(color) {
 			this._css(this.progressBar, "background", color);
 			this.progressInner && this._css(this.progressInner, "box-shadow", "0 0 10px " + color + ", 0 0 5px " + color);
@@ -421,11 +428,6 @@
 			this.targetValue = this.valueStep4;
 			this.play();
 			return this;
-		},
-
-		append: function(elem, style) {
-			elem.appendChild(this.progress);
-			this._css(this.progress, style);
 		}
 	};
 
