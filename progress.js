@@ -1,5 +1,5 @@
 /*!
- * Pseudo progress v0.9.2
+ * Pseudo progress v1.0.0
  * @author baijunjie
  *
  * https://github.com/baijunjie/progress.js
@@ -201,7 +201,6 @@
 		_init: function() {
 			this.progress = document.createElement("div");
 			this.progressBar = document.createElement("div");
-			this.progressInner = document.createElement("div");
 
 			this._css(this.progress, {
 				"display": "none",
@@ -224,18 +223,18 @@
 				"height": "2px"
 			});
 
-			this._css(this.progressInner, {
-				"position": "absolute",
-				"right": 0,
-				"width": "100px",
-				"height": "100%"
-			});
-
 			if (support.transform) {
+				this.progressInner = document.createElement("div");
+				this._css(this.progressInner, {
+					"position": "absolute",
+					"right": 0,
+					"width": "100px",
+					"height": "100%"
+				});
 				this._css(this.progressInner, support.transform, "rotate(3deg) translate(0px, -4px)");
+				this.progressBar.appendChild(this.progressInner);
 			}
 
-			this.progressBar.appendChild(this.progressInner);
 			this.progress.appendChild(this.progressBar);
 
 			this._addDocument = proxy(this._addDocument, this);
@@ -252,7 +251,6 @@
 
 		_loadedHandle: function() {
 			this.done();
-			this._removeLoadEvent();
 		},
 
 		_addLoadEvent: function() {
@@ -356,7 +354,7 @@
 
 		color: function(color) {
 			this._css(this.progressBar, "background", color);
-			this._css(this.progressInner, "box-shadow", "0 0 10px " + color + ", 0 0 5px " + color);
+			this.progressInner && this._css(this.progressInner, "box-shadow", "0 0 10px " + color + ", 0 0 5px " + color);
 			return this;
 		},
 
@@ -383,6 +381,9 @@
 		},
 
 		stop: function() {
+			if (this.listenerLoad) {
+				this._removeLoadEvent();
+			}
 			if (!this.isRun) return this;
 			this.isRun = false;
 			this.loop.remove(this._run);
@@ -390,6 +391,9 @@
 		},
 
 		play: function() {
+			if (this.listenerLoad) {
+				this._removeLoadEvent();
+			}
 			if (this.isRun) return this;
 			this.isRun = true;
 			this.loop.add(this._run, this);
@@ -397,9 +401,6 @@
 		},
 
 		start: function() {
-			if (this.listenerLoad) {
-				this._removeLoadEvent();
-			}
 			this._set(0);
 			this.coe = this.coeStep1;
 			this.targetValue = this.valueStep1;
@@ -420,6 +421,11 @@
 			this.targetValue = this.valueStep4;
 			this.play();
 			return this;
+		},
+
+		append: function(elem, style) {
+			elem.appendChild(this.progress);
+			this._css(this.progress, style);
 		}
 	};
 
