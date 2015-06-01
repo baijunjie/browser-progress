@@ -27,7 +27,7 @@
 ``` js
 // 修改进度条的容器，将进度条添加进指定的DOM元素中
 // 第2个参数可以帮助修改进度条的样式，一般只是修改它的position
-bjj.progress.append(elem, style);
+bjj.progress.appendTo(elem, style);
 
 bjj.progress.color("#000"); // 修改进度条颜色
 
