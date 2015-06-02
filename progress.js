@@ -1,5 +1,5 @@
 /*!
- * Pseudo progress v1.0.0
+ * Pseudo progress v1.1.0
  * @author baijunjie
  *
  * https://github.com/baijunjie/progress.js
@@ -170,11 +170,11 @@
 
 	function Progress(color) {
 		this.hideDuration = 400; // 进程隐藏的持续时间
-		this.coeStep1 = .05;
+		this.coeStep1 = .1;
 		this.coeStep2 = .01;
 		this.coeStep3 = .3;
 		this.coeStep4 = .1;
-		this.valueStep1 = 70;
+		this.valueStep1 = 20;
 		this.valueStep2 = 95;
 		this.valueStep3 = 100;
 		this.valueStep4 = 0;
@@ -200,44 +200,49 @@
 	Progress.prototype = {
 		_init: function() {
 			this.progress = document.createElement("div");
-			this.progressBar = document.createElement("div");
+			this.progressHeadLeft = document.createElement("div");
+			this.progressHeadRight = document.createElement("div");
 
 			this._css(this.progress, {
 				"display": "none",
-				"opacity": 1,
 				"-webkit-pointer-events": "none",
 				"pointer-events": "none",
 				"-webkit-user-select": "none",
 				"-moz-user-select": "none",
 				"user-select": "none",
 				"position": "fixed",
-				"top": 0,
-				"z-index": 99999,
-				"width": "100%",
-				"height": "10px",
-				"overflow": "hidden"
-			});
-
-			this._css(this.progressBar, {
-				"position": "absolute",
 				"right": "100%",
+				"top": 0,
+				"z-index": 2147483647,
 				"width": "100%",
-				"height": "2px"
+				"height": "2px",
+				"opacity": 1
 			});
 
-			if (support.transform) {
-				this.progressInner = document.createElement("div");
-				this._css(this.progressInner, {
-					"position": "absolute",
-					"right": 0,
-					"width": "100px",
-					"height": "100%"
-				});
-				this._css(this.progressInner, support.transform, "rotate(3deg) translate(0px, -4px)");
-				this.progressBar.appendChild(this.progressInner);
-			}
+			this._css(this.progressHeadLeft, {
+				"position": "absolute",
+				"right": "-80px",
+				"top": 0,
+				"width": "180px",
+				"height": "100%",
+				"opacity": .6,
+				"border-radius": "100%",
+				"clip": "rect(-6px,90px,14px,-6px)"
+			});
 
-			this.progress.appendChild(this.progressBar);
+			this._css(this.progressHeadRight, {
+				"position": "absolute",
+				"right": 0,
+				"top": 0,
+				"width": "20px",
+				"height": "100%",
+				"opacity": .6,
+				"border-radius": "100%",
+				"clip": "rect(-6px,22px,14px,10px)"
+			});
+
+			this.progress.appendChild(this.progressHeadLeft);
+			this.progress.appendChild(this.progressHeadRight);
 
 			this._addDocument = proxy(this._addDocument, this);
 			this._addDocument();
@@ -347,9 +352,9 @@
 				if (support.transform3d) {
 					transform += " translateZ(0)";
 				}
-				this._css(this.progressBar, support.transform, transform);
+				this._css(this.progress, support.transform, transform);
 			} else {
-				this._css(this.progressBar, "right", (100 - value) + "%");
+				this._css(this.progress, "right", (100 - value) + "%");
 			}
 			return this;
 		},
@@ -360,8 +365,9 @@
 		},
 
 		color: function(color) {
-			this._css(this.progressBar, "background", color);
-			this.progressInner && this._css(this.progressInner, "box-shadow", "0 0 10px " + color + ", 0 0 5px " + color);
+			this._css(this.progress, "background", color);
+			this._css(this.progressHeadLeft, "box-shadow", "1px 0 6px 1px" + color);
+			this._css(this.progressHeadRight, "box-shadow", "1px 0 6px 1px" + color);
 			return this;
 		},
 
