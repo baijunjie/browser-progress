@@ -1,5 +1,5 @@
 /*!
- * Pseudo progress v1.1.0
+ * Pseudo progress v1.1.1
  * @author baijunjie
  *
  * https://github.com/baijunjie/progress.js
@@ -366,8 +366,8 @@
 
 		color: function(color) {
 			this._css(this.progress, "background", color);
-			this._css(this.progressHeadLeft, "box-shadow", "1px 0 6px 1px" + color);
-			this._css(this.progressHeadRight, "box-shadow", "1px 0 6px 1px" + color);
+			this._css(this.progressHeadLeft, "box-shadow", "1px 0 6px 1px " + color);
+			this._css(this.progressHeadRight, "box-shadow", "1px 0 6px 1px " + color);
 			return this;
 		},
 
