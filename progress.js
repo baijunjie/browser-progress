@@ -1,5 +1,5 @@
 /*!
- * Pseudo progress v1.1.1
+ * Pseudo progress v1.1.2
  * @author baijunjie
  *
  * https://github.com/baijunjie/progress.js
@@ -360,8 +360,9 @@
 		},
 
 		appendTo: function(elem, style) {
-			elem.appendChild(this.progress);
-			this._css(this.progress, style);
+			elem && elem.appendChild(this.progress);
+			style && this._css(this.progress, style);
+			return this;
 		},
 
 		color: function(color) {
@@ -418,22 +419,19 @@
 			this.coe = this.coeStep1;
 			this.targetValue = this.valueStep1;
 			this._show();
-			this.play();
-			return this;
+			return this.play();
 		},
 
 		done: function() {
 			this.coe = this.coeStep3;
 			this.targetValue = this.valueStep3;
-			this.play();
-			return this;
+			return this.play();
 		},
 
 		fail: function() {
 			this.coe = this.coeStep4;
 			this.targetValue = this.valueStep4;
-			this.play();
-			return this;
+			return this.play();
 		}
 	};
 
