@@ -1,5 +1,5 @@
 /*!
- * Pseudo progress v1.1.2
+ * Pseudo progress v1.1.3
  * @author baijunjie
  *
  * https://github.com/baijunjie/progress.js
@@ -16,7 +16,7 @@
 		root.bjj.progress = factory();
 	}
 
-}(this, function() {
+}(this, function(require) {
 	"use strict";
 
 	var requestAnimationFrame = window.requestAnimationFrame,
@@ -191,7 +191,7 @@
 		this.color(color || "#2299dd");
 
 		this._loadedHandle = proxy(this._loadedHandle, this);
-		if (document.readyState !== "complete") {
+		if (document.readyState !== "complete" && !require) {
 			this.start();
 			this._addLoadEvent();
 		}
