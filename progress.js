@@ -300,8 +300,8 @@
 			if (!this.isShow) return;
 			this.isShow = false;
 			if (animate && support.transition) {
-				this._css(this.progress, "opacity", 0);
 				this._css(this.progress, support.transition, "opacity " + this.hideDuration + "ms");
+				this._css(this.progress, "opacity", 0);
 				var _this = this;
 				this.timerID = window.setTimeout(function() {
 					_this._css(_this.progress, "display", "none");
