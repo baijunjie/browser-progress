@@ -1,5 +1,5 @@
 /*!
- * Pseudo progress v1.1.3
+ * Pseudo progress v1.1.4
  * @author baijunjie
  *
  * https://github.com/baijunjie/progress.js
@@ -35,11 +35,11 @@
 	}
 
 	function Loop() {
-		this.requestAnimationFrame = requestAnimationFrame;
+		this._requestAnimationFrame = requestAnimationFrame;
 
-		if (!this.requestAnimationFrame) {
+		if (!this._requestAnimationFrame) {
 			var lastTime = 0;
-			this.requestAnimationFrame = function(callback) {
+			this._requestAnimationFrame = function(callback) {
 				var currTime = new Date().getTime(),
 					timeToCall = Math.max(0, 16 - (currTime - lastTime)),
 					id = window.setTimeout(function() {
@@ -50,26 +50,26 @@
 			};
 		}
 
-		this.runFunc = []; //储存所有主循环中运行的方法
-		this.loopRun = false; //表示循环是否已经运行（只要 runFunc 中有需要运行的方法，即使已经 stop，也视为运行状态）
-		this.isStop = false; //表示循环是否暂停
-		this.timerID = 0;
+		this._runFunc = []; //储存所有循环中运行的方法
+		this._active = !!this._runFunc.length; //表示循环是否在激活状态。当循环中存在需要运行的方法时，则被判定为激活状态
+		this._isRun = true; //表示循环是否在运行状态
+		this._timerID = 0;
 		this._loopCallback = proxy(this._loopCallback, this);
 	}
 
 	Loop.prototype = {
 		_loopCallback: function() {
-			var i = this.runFunc.length;
+			var i = this._runFunc.length;
 			while (i--) {
-				if (this.runFunc[i]() === false) { // 如果方法返回 false，则将该方法移出循环
-					this.runFunc.splice(i, 1);
+				if (this._runFunc[i]() === false) { // 如果方法返回 false，则将该方法移出循环
+					this._runFunc.splice(i, 1);
 				}
 			}
 
-			if (this.runFunc.length) {
-				this.timerID = this.requestAnimationFrame.call(window, this._loopCallback);
+			if (this._runFunc.length) {
+				this._timerID = this._requestAnimationFrame.call(window, this._loopCallback);
 			} else {
-				this.loopRun = false;
+				this._active = false;
 			}
 		},
 
@@ -78,42 +78,42 @@
 			if (target) {
 				func = proxy(func, target);
 			}
-			this.runFunc.unshift(func);
+			this._runFunc.unshift(func);
 
-			if (this.loopRun) return this;
-			this.loopRun = true;
-			if (!this.isStop) {
-				this.timerID = this.requestAnimationFrame.call(window, this._loopCallback);
+			if (this._active) return this;
+			this._active = true;
+			if (this._isRun) {
+				this._timerID = this._requestAnimationFrame.call(window, this._loopCallback);
 			}
 			return this;
 		},
 
 		remove: function(func) {
 			if (typeof func !== 'function') {
-				this.runFunc = [];
+				this._runFunc = [];
 				return this;
 			}
-			var i = this.runFunc.length;
+			var i = this._runFunc.length;
 			while (i--) {
-				if (this.runFunc[i].guid === func.guid) {
-					this.runFunc.splice(i, 1);
+				if (this._runFunc[i].guid === func.guid) {
+					this._runFunc.splice(i, 1);
 					return this;
 				}
 			}
 		},
 
 		stop: function() { // 停止循环
-			if (this.isStop) return this;
-			this.isStop = true;
-			cancelAnimationFrame(this.timerID);
+			if (!this._isRun) return this;
+			this._isRun = false;
+			cancelAnimationFrame(this._timerID);
 			return this;
 		},
 
 		play: function() { // 启动循环
-			if (!this.isStop) return this;
-			this.isStop = false;
-			if (this.loopRun) {
-				this.timerID = this.requestAnimationFrame.call(window, this._loopCallback);
+			if (this._isRun) return this;
+			this._isRun = true;
+			if (this._active) {
+				this._timerID = this._requestAnimationFrame.call(window, this._loopCallback);
 			}
 			return this;
 		}
@@ -142,25 +142,54 @@
 		return proxy;
 	}
 
+	var testElem = document.createElement("div");
+	// 返回支持的属性名
+	function getSupportPropertyName(prop) {
+		if (prop in testElem.style) return prop;
+
+		var testProp = prop.charAt(0).toUpperCase() + prop.substr(1),
+			prefixs = [ "Webkit", "Moz", "ms", "O" ];
+
+		for (var i = 0, l = prefixs.length; i < l; i++) {
+			var prefixProp = prefixs[i] + testProp;
+			if (prefixProp in testElem.style) {
+				return prefixProp;
+			}
+		}
+	}
+
+	// 检查是否支持3D
+	function checkTransform3dSupport() {
+		testElem.style[support.transform] = "";
+		testElem.style[support.transform] = "rotateY(90deg)";
+		return testElem.style[support.transform] !== "";
+	}
+
+	var support = {};
+	support.transform = getSupportPropertyName("transform");
+	support.transition = getSupportPropertyName("transition");
+	support.transform3d = checkTransform3dSupport();
+	testElem = null;
+
 	function Progress(color) {
-		this.hideDuration = 400; // 进程隐藏的持续时间
-		this.coeStep1 = .1;
-		this.coeStep2 = .01;
-		this.coeStep3 = .3;
-		this.coeStep4 = .1;
-		this.valueStep1 = 20;
-		this.valueStep2 = 95;
-		this.valueStep3 = 100;
-		this.valueStep4 = 0;
+		this._hideDuration = 400; // 进程隐藏的持续时间
+		this._coeStep1 = .1;
+		this._coeStep2 = .01;
+		this._coeStep3 = .3;
+		this._coeStep4 = .1;
+		this._valueStep1 = 20;
+		this._valueStep2 = 95;
+		this._valueStep3 = 100;
+		this._valueStep4 = 0;
 
-		this.value = 0;
-		this.targetValue = 100;
-		this.coe = 1;
-		this.isRun = false;
-		this.isShow = false;
-		this.timerID = 0; // 用于记录hide动画使用的计时器ID
+		this._value = 0;
+		this._targetValue = 100;
+		this._coe = 1;
+		this._isRun = false;
+		this._isShow = false;
+		this._timerID = 0; // 用于记录hide动画使用的计时器ID
 
-		this.loop = new Loop();
+		this._loop = new Loop();
 		this._init();
 		this.color(color || '#2299dd');
 
@@ -173,11 +202,11 @@
 
 	Progress.prototype = {
 		_init: function() {
-			this.progress = document.createElement('div');
-			this.progressHeadLeft = document.createElement('div');
-			this.progressHeadRight = document.createElement('div');
+			this._progress = document.createElement('div');
+			this._progressHeadLeft = document.createElement('div');
+			this._progressHeadRight = document.createElement('div');
 
-			this._css(this.progress, {
+			this._css(this._progress, {
 				'display': 'none',
 				'-webkit-pointer-events': 'none',
 				'pointer-events': 'none',
@@ -193,7 +222,7 @@
 				'opacity': 1
 			});
 
-			this._css(this.progressHeadLeft, {
+			this._css(this._progressHeadLeft, {
 				'position': 'absolute',
 				'right': '-80px',
 				'top': 0,
@@ -204,7 +233,7 @@
 				'clip': 'rect(-6px,90px,14px,-6px)'
 			});
 
-			this._css(this.progressHeadRight, {
+			this._css(this._progressHeadRight, {
 				'position': 'absolute',
 				'right': 0,
 				'top': 0,
@@ -215,8 +244,8 @@
 				'clip': 'rect(-6px,22px,14px,10px)'
 			});
 
-			this.progress.appendChild(this.progressHeadLeft);
-			this.progress.appendChild(this.progressHeadRight);
+			this._progress.appendChild(this._progressHeadLeft);
+			this._progress.appendChild(this._progressHeadRight);
 
 			this._addDocument = proxy(this._addDocument, this);
 			this._addDocument();
@@ -224,7 +253,7 @@
 
 		_addDocument: function() {
 			if (document.body) {
-				document.body.appendChild(this.progress);
+				document.body.appendChild(this._progress);
 			} else {
 				window.setTimeout(this._addDocument);
 			}
@@ -235,73 +264,73 @@
 		},
 
 		_addLoadEvent: function() {
-			this.listenerLoad = true;
+			this._listenerLoad = true;
 			if (window.addEventListener) window.addEventListener('load', this._loadedHandle, false);
 			else if (window.attachEvent) window.attachEvent('onload', this._loadedHandle);
 			else window.onload = this._loadedHandle;
 		},
 
 		_removeLoadEvent: function() {
-			this.listenerLoad = false;
+			this._listenerLoad = false;
 			if (window.removeEventListener) window.removeEventListener('load', this._loadedHandle, false);
 			else if (window.detachEvent) window.detachEvent('onload', this._loadedHandle);
 			else window.onload = null;
 		},
 
 		_run: function() {
-			var v = this.value,
-				d = this.targetValue - v,
-				t = d * this.coe;
+			var v = this._value,
+				d = this._targetValue - v,
+				t = d * this._coe;
 			if (Math.abs(d) > .1) {
 				v += t;
 				this._set(v);
 			} else {
-				this._set(this.targetValue);
-				if (this.targetValue === this.valueStep1) {
-					this.coe = this.coeStep2;
-					this.targetValue = this.valueStep2;
+				this._set(this._targetValue);
+				if (this._targetValue === this._valueStep1) {
+					this._coe = this._coeStep2;
+					this._targetValue = this._valueStep2;
 				} else {
-					if (this.targetValue === this.valueStep3 || this.targetValue === this.valueStep4) {
-						this._hide(this.targetValue);
+					if (this._targetValue === this._valueStep3 || this._targetValue === this._valueStep4) {
+						this._hide(this._targetValue);
 					}
-					this.isRun = false;
+					this._isRun = false;
 					return false;
 				}
 			}
 		},
 
 		_hide: function(animate) {
-			if (!this.isShow) return;
-			this.isShow = false;
+			if (!this._isShow) return;
+			this._isShow = false;
 			if (animate && support.transition) {
-				this._css(this.progress, support.transition, 'opacity ' + this.hideDuration + 'ms');
-				this._css(this.progress, 'opacity', 0);
+				this._css(this._progress, support.transition, 'opacity ' + this._hideDuration + 'ms');
+				this._css(this._progress, 'opacity', 0);
 				var _this = this;
-				this.timerID = window.setTimeout(function() {
-					_this._css(_this.progress, 'display', 'none');
-					_this._css(_this.progress, support.transition, '');
+				this._timerID = window.setTimeout(function() {
+					_this._css(_this._progress, 'display', 'none');
+					_this._css(_this._progress, support.transition, '');
 					_this._set(0);
-					_this.timerID = 0;
-				}, this.hideDuration);
+					_this._timerID = 0;
+				}, this._hideDuration);
 			} else {
-				this._css(this.progress, 'display', 'none');
+				this._css(this._progress, 'display', 'none');
 				this._set(0);
 			}
 			return this;
 		},
 
 		_show: function() {
-			if (this.isShow) return;
-			this.isShow = true;
+			if (this._isShow) return;
+			this._isShow = true;
 
-			if (this.timerID > 0) {
-				window.clearTimeout(this.timerID);
-				this._css(this.progress, support.transition, '');
+			if (this._timerID > 0) {
+				window.clearTimeout(this._timerID);
+				this._css(this._progress, support.transition, '');
 				this._set(0);
-				this.timerID = 0;
+				this._timerID = 0;
 			}
 
-			this._css(this.progress, {
+			this._css(this._progress, {
 				'display': 'block',
 				'opacity': 1
 			});
@@ -320,47 +349,47 @@
 		},
 
 		_set: function(value) {
-			this.value = value;
+			this._value = value;
 			if (support.transform) {
 				var transform = 'translate(' + value + '%,0)';
 				if (support.transform3d) {
 					transform += ' translateZ(0)';
 				}
-				this._css(this.progress, support.transform, transform);
+				this._css(this._progress, support.transform, transform);
 			} else {
-				this._css(this.progress, 'right', (100 - value) + '%');
+				this._css(this._progress, 'right', (100 - value) + '%');
 			}
 			return this;
 		},
 
 		appendTo: function(elem, style) {
-			elem && elem.appendChild(this.progress);
-			style && this._css(this.progress, style);
+			elem && elem.appendChild(this._progress);
+			style && this._css(this._progress, style);
 			return this;
 		},
 
 		color: function(color) {
-			this._css(this.progress, 'background', color);
-			this._css(this.progressHeadLeft, 'box-shadow', '1px 0 6px 1px ' + color);
-			this._css(this.progressHeadRight, 'box-shadow', '1px 0 6px 1px ' + color);
+			this._css(this._progress, 'background', color);
+			this._css(this._progressHeadLeft, 'box-shadow', '1px 0 6px 1px ' + color);
+			this._css(this._progressHeadRight, 'box-shadow', '1px 0 6px 1px ' + color);
 			return this;
 		},
 
 		set: function(value) {
 			this.stop();
 			value = Math.max(0, Math.min(100, value));
-			if (value < this.valueStep1) {
-				this.coe = this.coeStep1;
-				this.targetValue = this.valueStep1;
-			} else if (value < this.valueStep2) {
-				this.coe = this.coeStep2;
-				this.targetValue = this.valueStep2;
-			} else if (value < this.valueStep3) {
-				this.coe = this.coeStep3;
-				this.targetValue = this.valueStep3;
+			if (value < this._valueStep1) {
+				this._coe = this._coeStep1;
+				this._targetValue = this._valueStep1;
+			} else if (value < this._valueStep2) {
+				this._coe = this._coeStep2;
+				this._targetValue = this._valueStep2;
+			} else if (value < this._valueStep3) {
+				this._coe = this._coeStep3;
+				this._targetValue = this._valueStep3;
 			}
 			this._set(value);
-			if (value === this.valueStep3 || value === this.valueStep4) {
+			if (value === this._valueStep3 || value === this._valueStep4) {
 				this._hide(value);
 			} else {
 				this._show();
@@ -369,42 +398,42 @@
 		},
 
 		stop: function() {
-			if (this.listenerLoad) {
+			if (this._listenerLoad) {
 				this._removeLoadEvent();
 			}
-			if (!this.isRun) return this;
-			this.isRun = false;
-			this.loop.remove(this._run);
+			if (!this._isRun) return this;
+			this._isRun = false;
+			this._loop.remove(this._run);
 			return this;
 		},
 
 		play: function() {
-			if (this.listenerLoad) {
+			if (this._listenerLoad) {
 				this._removeLoadEvent();
 			}
-			if (this.isRun) return this;
-			this.isRun = true;
-			this.loop.add(this._run, this);
+			if (this._isRun) return this;
+			this._isRun = true;
+			this._loop.add(this._run, this);
 			return this;
 		},
 
 		start: function() {
 			this._set(0);
-			this.coe = this.coeStep1;
-			this.targetValue = this.valueStep1;
+			this._coe = this._coeStep1;
+			this._targetValue = this._valueStep1;
 			this._show();
 			return this.play();
 		},
 
 		done: function() {
-			this.coe = this.coeStep3;
-			this.targetValue = this.valueStep3;
+			this._coe = this._coeStep3;
+			this._targetValue = this._valueStep3;
 			return this.play();
 		},
 
 		fail: function() {
-			this.coe = this.coeStep4;
-			this.targetValue = this.valueStep4;
+			this._coe = this._coeStep4;
+			this._targetValue = this._valueStep4;
 			return this.play();
 		}
 	};
