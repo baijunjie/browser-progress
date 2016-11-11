@@ -5,11 +5,11 @@
  * https://github.com/baijunjie/progress.js
  */
 (function(root, factory) {
-	"use strict";
+	'use strict';
 
-	if (typeof define === "function" && define.amd) {
+	if (typeof define === 'function' && define.amd) {
 		define(factory);
-	} else if (typeof exports === "object") {
+	} else if (typeof exports === 'object') {
 		module.exports = factory();
 	} else {
 		root.bjj = root.bjj || {};
@@ -17,7 +17,7 @@
 	}
 
 }(this, function(require) {
-	"use strict";
+	'use strict';
 
 	var requestAnimationFrame = window.requestAnimationFrame,
 		cancelAnimationFrame = window.cancelAnimationFrame,
@@ -33,35 +33,6 @@
 			window.clearTimeout(id);
 		};
 	}
-
-	var testElem = document.createElement("div");
-	// 返回支持的属性名
-	function getSupportPropertyName(prop) {
-		if (prop in testElem.style) return prop;
-
-		var testProp = prop.charAt(0).toUpperCase() + prop.substr(1),
-			prefixs = [ "Webkit", "Moz", "ms", "O" ];
-
-		for (var i = 0, l = prefixs.length; i < l; i++) {
-			var prefixProp = prefixs[i] + testProp;
-			if (prefixProp in testElem.style) {
-				return prefixProp;
-			}
-		}
-	}
-
-	// 检查是否支持3D
-	function checkTransform3dSupport() {
-		testElem.style[support.transform] = "";
-		testElem.style[support.transform] = "rotateY(90deg)";
-		return testElem.style[support.transform] !== "";
-	}
-
-	var support = {};
-	support.transform = getSupportPropertyName("transform");
-	support.transition = getSupportPropertyName("transition");
-	support.transform3d = checkTransform3dSupport();
-	testElem = null;
 
 	function Loop() {
 		this.requestAnimationFrame = requestAnimationFrame;
@@ -103,12 +74,11 @@
 		},
 
 		add: function(func, target) {
-			if (typeof func !== "function") return this;
-			var f = func;
+			if (typeof func !== 'function') return this;
 			if (target) {
-				f = proxy(func, target);
+				func = proxy(func, target);
 			}
-			this.runFunc.unshift(f);
+			this.runFunc.unshift(func);
 
 			if (this.loopRun) return this;
 			this.loopRun = true;
@@ -119,23 +89,27 @@
 		},
 
 		remove: function(func) {
-			if (typeof func !== "function") return this;
+			if (typeof func !== 'function') {
+				this.runFunc = [];
+				return this;
+			}
 			var i = this.runFunc.length;
 			while (i--) {
 				if (this.runFunc[i].guid === func.guid) {
 					this.runFunc.splice(i, 1);
+					return this;
 				}
 			}
 		},
 
-		stop: function() { // 循环暂停运行
+		stop: function() { // 停止循环
 			if (this.isStop) return this;
 			this.isStop = true;
 			cancelAnimationFrame(this.timerID);
 			return this;
 		},
 
-		play: function() { // 循环恢复运行
+		play: function() { // 启动循环
 			if (!this.isStop) return this;
 			this.isStop = false;
 			if (this.loopRun) {
@@ -147,13 +121,13 @@
 
 	var guid = 0;
 	function proxy(func, target) {
-		if (typeof target === "string") {
+		if (typeof target === 'string') {
 			var tmp = func[target];
 			target = func;
 			func = tmp;
 		}
 
-		if (typeof func !== "function") {
+		if (typeof func !== 'function') {
 			return undefined;
 		}
 
@@ -188,10 +162,10 @@
 
 		this.loop = new Loop();
 		this._init();
-		this.color(color || "#2299dd");
+		this.color(color || '#2299dd');
 
 		this._loadedHandle = proxy(this._loadedHandle, this);
-		if (document.readyState !== "complete" && !require) {
+		if (document.readyState !== 'complete' && !require) {
 			this.start();
 			this._addLoadEvent();
 		}
@@ -199,46 +173,46 @@
 
 	Progress.prototype = {
 		_init: function() {
-			this.progress = document.createElement("div");
-			this.progressHeadLeft = document.createElement("div");
-			this.progressHeadRight = document.createElement("div");
+			this.progress = document.createElement('div');
+			this.progressHeadLeft = document.createElement('div');
+			this.progressHeadRight = document.createElement('div');
 
 			this._css(this.progress, {
-				"display": "none",
-				"-webkit-pointer-events": "none",
-				"pointer-events": "none",
-				"-webkit-user-select": "none",
-				"-moz-user-select": "none",
-				"user-select": "none",
-				"position": "fixed",
-				"right": "100%",
-				"top": 0,
-				"z-index": 2147483647,
-				"width": "100%",
-				"height": "2px",
-				"opacity": 1
+				'display': 'none',
+				'-webkit-pointer-events': 'none',
+				'pointer-events': 'none',
+				'-webkit-user-select': 'none',
+				'-moz-user-select': 'none',
+				'user-select': 'none',
+				'position': 'fixed',
+				'right': '100%',
+				'top': 0,
+				'z-index': 2147483647,
+				'width': '100%',
+				'height': '2px',
+				'opacity': 1
 			});
 
 			this._css(this.progressHeadLeft, {
-				"position": "absolute",
-				"right": "-80px",
-				"top": 0,
-				"width": "180px",
-				"height": "100%",
-				"opacity": .6,
-				"border-radius": "100%",
-				"clip": "rect(-6px,90px,14px,-6px)"
+				'position': 'absolute',
+				'right': '-80px',
+				'top': 0,
+				'width': '180px',
+				'height': '100%',
+				'opacity': .6,
+				'border-radius': '100%',
+				'clip': 'rect(-6px,90px,14px,-6px)'
 			});
 
 			this._css(this.progressHeadRight, {
-				"position": "absolute",
-				"right": 0,
-				"top": 0,
-				"width": "20px",
-				"height": "100%",
-				"opacity": .6,
-				"border-radius": "100%",
-				"clip": "rect(-6px,22px,14px,10px)"
+				'position': 'absolute',
+				'right': 0,
+				'top': 0,
+				'width': '20px',
+				'height': '100%',
+				'opacity': .6,
+				'border-radius': '100%',
+				'clip': 'rect(-6px,22px,14px,10px)'
 			});
 
 			this.progress.appendChild(this.progressHeadLeft);
@@ -262,15 +236,15 @@
 
 		_addLoadEvent: function() {
 			this.listenerLoad = true;
-			if (window.addEventListener) window.addEventListener("load", this._loadedHandle, false);
-			else if (window.attachEvent) window.attachEvent("onload", this._loadedHandle);
+			if (window.addEventListener) window.addEventListener('load', this._loadedHandle, false);
+			else if (window.attachEvent) window.attachEvent('onload', this._loadedHandle);
 			else window.onload = this._loadedHandle;
 		},
 
 		_removeLoadEvent: function() {
 			this.listenerLoad = false;
-			if (window.removeEventListener) window.removeEventListener("load", this._loadedHandle, false);
-			else if (window.detachEvent) window.detachEvent("onload", this._loadedHandle);
+			if (window.removeEventListener) window.removeEventListener('load', this._loadedHandle, false);
+			else if (window.detachEvent) window.detachEvent('onload', this._loadedHandle);
 			else window.onload = null;
 		},
 
@@ -300,17 +274,17 @@
 			if (!this.isShow) return;
 			this.isShow = false;
 			if (animate && support.transition) {
-				this._css(this.progress, support.transition, "opacity " + this.hideDuration + "ms");
-				this._css(this.progress, "opacity", 0);
+				this._css(this.progress, support.transition, 'opacity ' + this.hideDuration + 'ms');
+				this._css(this.progress, 'opacity', 0);
 				var _this = this;
 				this.timerID = window.setTimeout(function() {
-					_this._css(_this.progress, "display", "none");
-					_this._css(_this.progress, support.transition, "");
+					_this._css(_this.progress, 'display', 'none');
+					_this._css(_this.progress, support.transition, '');
 					_this._set(0);
 					_this.timerID = 0;
 				}, this.hideDuration);
 			} else {
-				this._css(this.progress, "display", "none");
+				this._css(this.progress, 'display', 'none');
 				this._set(0);
 			}
 			return this;
@@ -322,24 +296,24 @@
 
 			if (this.timerID > 0) {
 				window.clearTimeout(this.timerID);
-				this._css(this.progress, support.transition, "");
+				this._css(this.progress, support.transition, '');
 				this._set(0);
 				this.timerID = 0;
 			}
 
 			this._css(this.progress, {
-				"display": "block",
-				"opacity": 1
+				'display': 'block',
+				'opacity': 1
 			});
 			return this;
 		},
 
 		_css: function(elem, prop, value) {
-			if (typeof prop === "object") {
+			if (typeof prop === 'object') {
 				for (var p in prop) {
 					elem.style[p] = prop[p];
 				}
-			} else if (typeof value !== "undefined") {
+			} else if (typeof value !== 'undefined') {
 				elem.style[prop] = value;
 			}
 			return this;
@@ -348,13 +322,13 @@
 		_set: function(value) {
 			this.value = value;
 			if (support.transform) {
-				var transform = "translate(" + value + "%,0)";
+				var transform = 'translate(' + value + '%,0)';
 				if (support.transform3d) {
-					transform += " translateZ(0)";
+					transform += ' translateZ(0)';
 				}
 				this._css(this.progress, support.transform, transform);
 			} else {
-				this._css(this.progress, "right", (100 - value) + "%");
+				this._css(this.progress, 'right', (100 - value) + '%');
 			}
 			return this;
 		},
@@ -366,9 +340,9 @@
 		},
 
 		color: function(color) {
-			this._css(this.progress, "background", color);
-			this._css(this.progressHeadLeft, "box-shadow", "1px 0 6px 1px " + color);
-			this._css(this.progressHeadRight, "box-shadow", "1px 0 6px 1px " + color);
+			this._css(this.progress, 'background', color);
+			this._css(this.progressHeadLeft, 'box-shadow', '1px 0 6px 1px ' + color);
+			this._css(this.progressHeadRight, 'box-shadow', '1px 0 6px 1px ' + color);
 			return this;
 		},
 
