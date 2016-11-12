@@ -53,7 +53,7 @@ bjj.progress.show(); // 显示默认的进度条样式
 bjj.progress.progress(callback);
 
 // 淡出动画（用于自定义进度条）
-// 使 elem 元素在 duration 秒内淡出，duration 默认为 400
+// 使 elem 元素在 duration 毫秒内淡出，duration 默认为 400
 // 如果 duration 为一个 function，则 duration 会被当做 callback 来处理，同时第三个参数 callback 会被忽略
 bjj.progress.fadeOut(elem, duration, callback);
 ```
