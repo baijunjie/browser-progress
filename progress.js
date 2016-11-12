@@ -1,5 +1,5 @@
 /*!
- * Pseudo progress v1.1.4
+ * Pseudo progress v1.2.0
  * @author baijunjie
  *
  * https://github.com/baijunjie/progress.js
@@ -177,17 +177,19 @@
 		this._coeStep2 = .01;
 		this._coeStep3 = .3;
 		this._coeStep4 = .1;
-		this._valueStep1 = 20;
-		this._valueStep2 = 95;
-		this._valueStep3 = 100;
-		this._valueStep4 = 0;
+		this._valueStep0 = 0;
+		this._valueStep1 = .2;
+		this._valueStep2 = .95;
+		this._valueStep3 = 1;
 
+		this._mind = this._valueStep3 * 0.001;
 		this._value = 0;
-		this._targetValue = 100;
+		this._targetValue = 0;
 		this._coe = 1;
 		this._isRun = false;
 		this._isShow = false;
 		this._timerID = 0; // 用于记录hide动画使用的计时器ID
+		this._progressCallback = function(){};
 
 		this._loop = new Loop();
 		this._init();
@@ -281,7 +283,7 @@
 			var v = this._value,
 				d = this._targetValue - v,
 				t = d * this._coe;
-			if (Math.abs(d) > .1) {
+			if (Math.abs(d) > this._mind) {
 				v += t;
 				this._set(v);
 			} else {
@@ -290,7 +292,7 @@
 					this._coe = this._coeStep2;
 					this._targetValue = this._valueStep2;
 				} else {
-					if (this._targetValue === this._valueStep3 || this._targetValue === this._valueStep4) {
+					if (this._targetValue === this._valueStep3 || this._targetValue === this._valueStep0) {
 						this._hide(this._targetValue);
 					}
 					this._isRun = false;
@@ -302,20 +304,10 @@
 		_hide: function(animate) {
 			if (!this._isShow) return;
 			this._isShow = false;
-			if (animate && support.transition) {
-				this._css(this._progress, support.transition, 'opacity ' + this._hideDuration + 'ms');
-				this._css(this._progress, 'opacity', 0);
-				var _this = this;
-				this._timerID = window.setTimeout(function() {
-					_this._css(_this._progress, 'display', 'none');
-					_this._css(_this._progress, support.transition, '');
-					_this._set(0);
-					_this._timerID = 0;
-				}, this._hideDuration);
-			} else {
-				this._css(this._progress, 'display', 'none');
-				this._set(0);
-			}
+
+			// 如果 animate 为 0 或者 undefined 这表示不需要淡出动画
+			// 否则以 this._hideDuration 的时长进行淡出
+			this.fadeOut(this._progress, (animate || 0) && this._hideDuration);
 			return this;
 		},
 
@@ -325,15 +317,11 @@
 
 			if (this._timerID > 0) {
 				window.clearTimeout(this._timerID);
-				this._css(this._progress, support.transition, '');
-				this._set(0);
 				this._timerID = 0;
+				this._fadeOutCallback();
 			}
 
-			this._css(this._progress, {
-				'display': 'block',
-				'opacity': 1
-			});
+			this._css(this._progress, 'display', 'block');
 			return this;
 		},
 
@@ -351,14 +339,15 @@
 		_set: function(value) {
 			this._value = value;
 			if (support.transform) {
-				var transform = 'translate(' + value + '%,0)';
+				var transform = 'translate(' + (value * 100) + '%,0)';
 				if (support.transform3d) {
 					transform += ' translateZ(0)';
 				}
 				this._css(this._progress, support.transform, transform);
 			} else {
-				this._css(this._progress, 'right', (100 - value) + '%');
+				this._css(this._progress, 'right', (this._valueStep3 - value) * 100 + '%');
 			}
+			this._progressCallback(value);
 			return this;
 		},
 
@@ -377,7 +366,7 @@
 
 		set: function(value) {
 			this.stop();
-			value = Math.max(0, Math.min(100, value));
+			value = Math.max(this._valueStep0, Math.min(this._valueStep3, value));
 			if (value < this._valueStep1) {
 				this._coe = this._coeStep1;
 				this._targetValue = this._valueStep1;
@@ -389,7 +378,7 @@
 				this._targetValue = this._valueStep3;
 			}
 			this._set(value);
-			if (value === this._valueStep3 || value === this._valueStep4) {
+			if (value === this._valueStep3 || value === this._valueStep0) {
 				this._hide(value);
 			} else {
 				this._show();
@@ -433,9 +422,68 @@
 
 		fail: function() {
 			this._coe = this._coeStep4;
-			this._targetValue = this._valueStep4;
+			this._targetValue = this._valueStep0;
 			return this.play();
-		}
+		},
+
+		hide: function() {
+			this._css(this._progress, 'visibility', 'hidden');
+			return this;
+		},
+
+		show: function() {
+			this._css(this._progress, 'visibility', 'visible');
+			return this;
+		},
+
+		progress: function(callback) {
+			this._progressCallback = callback;
+			return this;
+		},
+
+		fadeOut: function(elem, duration, callback) {
+			if (typeof duration === 'function') {
+				callback = duration;
+				duration = this._hideDuration;
+			} else if (typeof duration !== 'number') {
+				duration = this._hideDuration;
+			}
+
+			var _this = this,
+				css = this._css;
+
+			// 这里使用异步，是为了等待视图完全刷新到 100% 状态后在执行隐藏操作
+			// 否则会出现视图在 99% 时，进度条就隐藏了
+			window.setTimeout(function() {
+				if (duration && support.transition) {
+					// 如果之前调用过 fadeOut, 这里将生成的 this._fadeOutCallback 保存至 fadeOutCallback
+					// 在新的 this._fadeOutCallback 开始执行时，先执行之前的 fadeOutCallback
+					var fadeOutCallback = _this._fadeOutCallback;
+					_this._fadeOutCallback = function() {
+						fadeOutCallback && fadeOutCallback.call(_this);
+						css(elem, 'display', 'none');
+						css(elem, support.transition, '');
+						css(elem, 'opacity', 1);
+						callback && callback.call(_this);
+						_this._fadeOutCallback = null;
+					};
+
+					css(elem, support.transition, 'opacity ' + duration + 'ms');
+					css(elem, 'opacity', 0);
+
+					if (_this._timerID > 0) window.clearTimeout(_this._timerID);
+					_this._timerID = window.setTimeout(function() {
+						_this._timerID = 0;
+						_this._fadeOutCallback();
+					}, duration);
+				} else {
+					css(elem, 'display', 'none');
+					callback && callback.call(_this);
+				}
+			});
+
+			return this;
+		},
 	};
 
 	var progress = new Progress();
