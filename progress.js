@@ -1,6 +1,7 @@
 /*!
  * Pseudo progress v1.2.0
- * @author baijunjie
+ * (c) 2014-2016 BaiJunjie
+ * MIT Licensed.
  *
  * https://github.com/baijunjie/progress.js
  */
