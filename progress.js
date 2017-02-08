@@ -1,6 +1,6 @@
 /*!
- * Pseudo progress v1.2.0
- * (c) 2014-2016 BaiJunjie
+ * Pseudo progress v1.2.1
+ * (c) 2014-2017 BaiJunjie
  * MIT Licensed.
  *
  * https://github.com/baijunjie/progress.js
@@ -8,10 +8,10 @@
 (function(root, factory) {
 	'use strict';
 
-	if (typeof define === 'function' && define.amd) {
-		define(factory);
-	} else if (typeof exports === 'object') {
+	if (typeof module === 'object' && typeof exports === 'object') {
 		module.exports = factory();
+	} else if (typeof define === 'function' && define.amd) {
+		define(factory);
 	} else {
 		root.bjj = root.bjj || {};
 		root.bjj.progress = factory();
