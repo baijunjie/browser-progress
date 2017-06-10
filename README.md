@@ -1,4 +1,4 @@
-﻿# progress.js
+# progress.js
 
 一款小巧的伪进度条插件，会在页面顶部伪装一个进度条，就好像 [YouTube](https://www.youtube.com/) 正在使用的那种。<br>
 支持 IE6-8 等老式浏览器。
@@ -21,11 +21,21 @@
 [progress.js]: https://github.com/baijunjie/progress.js/blob/master/progress.js
 
 
+## AMD
+
+该插件同时支持模块化调用，但是通过模块化调用时，progress 不会监听页面的 load 事件，也不会在初加入页面时自动启动进程。
+
+## npm
+
+```shell
+$ npm install browser-progress
+```
+
 ## API
 
 如果不通过模块化加载，那么可以通过全局对象 bjj.progress 进行调用。
 
-``` js
+```js
 // 修改进度条的容器，将进度条添加进指定的DOM元素中
 // 第2个参数可以帮助修改进度条的样式，一般只是修改它的position
 bjj.progress.appendTo(elem, style);
@@ -58,12 +68,7 @@ bjj.progress.progress(callback);
 bjj.progress.fadeOut(elem, duration, callback);
 ```
 
-如果使用 Ajax 更新页面内容，可以调用 .start() 方法重新开始进程，然后在 Ajax 的完成回调中调用 .done() 方法完成进程。<br>
-
-
-## AMD
-
-该插件同时支持模块化调用，但是通过模块化调用时，progress 不会监听页面的 load 事件，也不会在初加入页面时自动启动进程。
+如果使用 Ajax 更新页面内容，可以调用 .start() 方法重新开始进程，然后在 Ajax 的完成回调中调用 .done() 方法完成进程。
 
 ## CustomProgress
 
@@ -88,7 +93,6 @@ bjj.progress.fadeOut(elem, duration, callback);
 		}
 	});
 </script>
-
 ```
 
 
