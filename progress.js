@@ -1,5 +1,5 @@
 /*!
- * Pseudo progress v1.2.2
+ * Pseudo progress v1.2.3
  * (c) 2014-2017 Junjie.Bai
  * MIT Licensed.
  *

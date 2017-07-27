@@ -1,6 +1,6 @@
 {
   "name": "browser-progress",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "一款小巧的伪进度条插件",
   "main": "progress.js",
   "scripts": {
