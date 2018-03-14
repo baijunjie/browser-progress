@@ -32,7 +32,7 @@ $ npm install browser-progress
 
 ## API
 
-如果不通过模块化加载，那么可以通过全局对象 bjj.progress 进行调用。
+如果不通过模块化加载，那么可以通过全局对象 progress 进行调用。
 
 ```js
 // 修改进度条的容器，将进度条添加进指定的DOM元素中
