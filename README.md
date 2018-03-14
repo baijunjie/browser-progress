@@ -69,7 +69,7 @@ progress.fadeOut(elem, duration, callback);
 
 如果使用 Ajax 更新页面内容，可以调用 .start() 方法重新开始进程，然后在 Ajax 的完成回调中调用 .done() 方法完成进程。
 
-## CustomProgress
+## Custom Progress
 
 实现自定义进度条
 ``` html
