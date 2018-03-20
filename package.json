@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/baijunjie/progress.js.git"
+    "url": "git+https://github.com/baijunjie/browser-progress.git"
   },
   "author": "Junjie.Bai",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/baijunjie/progress.js/issues"
+    "url": "https://github.com/baijunjie/browser-progress/issues"
   },
-  "homepage": "https://github.com/baijunjie/progress.js#readme"
+  "homepage": "https://github.com/baijunjie/browser-progress#readme"
 }
