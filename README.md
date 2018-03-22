@@ -88,7 +88,7 @@ BrowserProgress.fadeOut(elem, duration, callback);
 <script src="BrowserProgress.js"></script>
 <script>
     BrowserProgress.hide(); // 隐藏掉原有的进度条样式
-    BrowserProgress.progress(function(value) {
+    BrowserProgress.step(function(value) {
         var percent = Math.round(value * 100) + '%';
         document.getElementById('progress-text').innerHTML = percent;
         document.getElementById('progress-bar').style.width = percent;
