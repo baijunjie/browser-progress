@@ -17,8 +17,8 @@
 ``` html
 <body>
 <script src="BrowserProgress.js"></script>
-	.....
-	.....
+    .....
+    .....
 </body>
 ```
 
@@ -79,23 +79,23 @@ BrowserProgress.fadeOut(elem, duration, callback);
 实现自定义进度条
 ``` html
 <div id="progress-area">
-	<div id="progress-text">0%</div>
-	<div class="progress">
-		<p id="progress-bar"></p>
-	</div>
+    <div id="progress-text">0%</div>
+    <div class="progress">
+        <p id="progress-bar"></p>
+    </div>
 </div>
 
 <script src="BrowserProgress.js"></script>
 <script>
-	BrowserProgress.hide(); // 隐藏掉原有的进度条样式
-	BrowserProgress.progress(function(value) {
-		var percent = Math.round(value * 100) + '%';
-		document.getElementById('progress-text').innerHTML = percent;
-		document.getElementById('progress-bar').style.width = percent;
-		if (value == 1) {
-			BrowserProgress.fadeOut(document.getElementById('progress-area'));
-		}
-	});
+    BrowserProgress.hide(); // 隐藏掉原有的进度条样式
+    BrowserProgress.progress(function(value) {
+        var percent = Math.round(value * 100) + '%';
+        document.getElementById('progress-text').innerHTML = percent;
+        document.getElementById('progress-bar').style.width = percent;
+        if (value == 1) {
+            BrowserProgress.fadeOut(document.getElementById('progress-area'));
+        }
+    });
 </script>
 ```
 
