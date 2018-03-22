@@ -1,0 +1,12 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title><%= htmlWebpackPlugin.options.title %></title>
+</head>
+<body ontouchstart>
+<% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+<script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
+<% } %>
+</body>
+</html>
