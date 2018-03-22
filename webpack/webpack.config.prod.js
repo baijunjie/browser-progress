@@ -2,6 +2,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpackConfigBase = require('./webpack.config.base');
 const pkg = require('../package.json');
@@ -29,7 +30,23 @@ module.exports = [
             filename: '[name].min.js'
         },
         optimization: {
-            minimize: true
+            minimize: true,
+            minimizer: [
+                new UglifyJSPlugin({
+                    uglifyOptions: {
+                        // https://github.com/mishoo/UglifyJS2/tree/harmony#output-options
+                        output: {
+                            comments: '/' + process.env.PROJECT_NAME + '/'
+                        },
+                        // https://github.com/mishoo/UglifyJS2/tree/harmony#compress-options
+                        compress: {
+                            warnings: false,
+                            drop_debugger: true,
+                            // drop_console: true
+                        }
+                    }
+                })
+            ]
         }
     }),
     merge(webpackConfig, {
