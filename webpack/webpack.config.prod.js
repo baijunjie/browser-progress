@@ -8,6 +8,7 @@ const webpackConfigBase = require('./webpack.config.base');
 const pkg = require('../package.json');
 
 const webpackConfig = merge(webpackConfigBase, {
+    mode: 'production', // 在导入的代码中，任何出现 process.env.NODE_ENV 的地方都会被替换为 "production"
     output: {
         path: path.resolve(__dirname, '../dist')
     },
@@ -15,10 +16,6 @@ const webpackConfig = merge(webpackConfigBase, {
         minimize: false
     },
     plugins: [
-        // 在导入的代码中，任何出现 process.env.NODE_ENV 的地方都会被替换为 "production"
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production')
-        }),
         new webpack.BannerPlugin(`[name] - ${pkg.description}\n@version v${pkg.version}\n@author ${pkg.author}\n@license ${pkg.license}\n\n${pkg.repository.type} - ${pkg.repository.url}`)
     ]
 });

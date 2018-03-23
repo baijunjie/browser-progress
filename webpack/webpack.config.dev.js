@@ -6,11 +6,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpackConfigBase = require('./webpack.config.base');
 
 module.exports = merge(webpackConfigBase, {
+    mode: 'development', // 在导入的代码中，任何出现 process.env.NODE_ENV 的地方都会被替换为 "development"
     plugins: [
-        // 在导入的代码中，任何出现 process.env.NODE_ENV 的地方都会被替换为 "development"
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('development')
-        }),
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
             title: process.env.PROJECT_NAME,
