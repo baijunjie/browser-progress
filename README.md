@@ -46,7 +46,7 @@ BrowserProgress.color("#000"); // 修改进度条颜色
 
 BrowserProgress.set(.5); // 设置进程的当前值，取值为 0~1 的浮点数。同时会暂停运行中的进程，使进程变为手动设置
 
-BrowserProgress.stop(); //	暂停进程
+BrowserProgress.stop(); // 暂停进程
 
 BrowserProgress.play(); // 恢复运行进程
 
