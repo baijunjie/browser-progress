@@ -1,5 +1,6 @@
 import mainloop from 'mainloop';
-import { support, proxy, css } from './utils';
+import bind from '@module-factory/utils/bind';
+import { support, css } from './utils';
 
 class Progress {
     constructor(color) {
@@ -26,10 +27,14 @@ class Progress {
         this._timerID = 0; // 用于记录hide动画使用的计时器ID
         this._stepCallback = function() {};
 
+        bind(
+            this,
+            '_loadedHandle',
+            '_addDocument'
+        );
+
         this._createElem();
         this.color(color || '#000');
-
-        this._loadedHandle = proxy(this._loadedHandle, this);
 
         if (document.readyState !== 'complete') {
             this.start();
@@ -83,7 +88,6 @@ class Progress {
         this._progress.appendChild(this._progressHeadLeft);
         this._progress.appendChild(this._progressHeadRight);
 
-        this._addDocument = proxy(this._addDocument, this);
         this._addDocument();
     }
 
@@ -303,7 +307,7 @@ class Progress {
                 this._timerID = setTimeout(() => {
                     this._timerID = 0;
                     this._fadeOutCallback();
-                }, duration);
+                }, 100000);
             } else {
                 css(elem, 'display', 'none');
                 callback && callback.call(this);

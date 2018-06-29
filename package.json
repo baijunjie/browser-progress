@@ -1,41 +1,34 @@
 {
   "name": "browser-progress",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "一款小巧的伪进度条插件",
+  "author": "Junjie.Bai",
+  "license": "MIT",
   "main": "dist/BrowserProgress.js",
   "module": "src/index.js",
+  "files": [
+    "src",
+    "dist",
+    "!.DS_Store"
+  ],
   "scripts": {
-    "dev": "webpack-dev-server --config webpack/webpack.config.dev.js --open",
-    "build": "webpack --config webpack/webpack.config.prod.js"
+    "dev": "USER_CONFIG=mod.config.js webpack-dev-server --config node_modules/@module-factory/service/webpack.config/dev.js",
+    "build": "USER_CONFIG=mod.config.js webpack --config node_modules/@module-factory/service/webpack.config/prod.js"
+  },
+  "dependencies": {
+    "@module-factory/utils": "latest",
+    "mainloop": "^1.0.3"
+  },
+  "devDependencies": {
+    "@module-factory/service": "latest",
+    "@module-factory/template": "latest"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/baijunjie/browser-progress.git"
   },
-  "author": "Junjie.Bai",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/baijunjie/browser-progress/issues"
   },
-  "homepage": "https://github.com/baijunjie/browser-progress#readme",
-  "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-stage-0": "^6.24.1",
-    "html-webpack-plugin": "^3.0.7",
-    "webpack": "^4.2.0",
-    "webpack-cli": "^2.0.12",
-    "webpack-dev-server": "^3.1.1",
-    "webpack-merge": "^4.1.0"
-  },
-  "dependencies": {
-    "mainloop": "^1.0.2"
-  },
-  "files": [
-    "src",
-    "dist"
-  ]
+  "homepage": "https://github.com/baijunjie/browser-progress#readme"
 }

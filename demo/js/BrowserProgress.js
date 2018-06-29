@@ -1,6 +1,6 @@
 /*!
  * BrowserProgress - 一款小巧的伪进度条插件
- * @version v1.3.2
+ * @version v1.3.3
  * @author Junjie.Bai
  * @license MIT
  * 
@@ -54,17 +54,32 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -84,7 +99,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -100,7 +115,6 @@ Object.defineProperty(exports, "__esModule", {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-exports.proxy = proxy;
 exports.css = css;
 var testElem = document.createElement('div');
 
@@ -132,37 +146,6 @@ support.transition = getSupportPropertyName('transition');
 support.transform3d = checkTransform3dSupport();
 testElem = null;
 
-// 使用方法一：
-// 第一个参数为调用的方法
-// 第二个参数为该方法调用时 this 的引用对象，如果传入 null，则不会改变 this 的引用
-// 使用方法二：
-// 第一个参数为调用方法时 this 的引用对象，如果传入 null，则不会改变 this 的引用
-// 第二个参数为将要调用 this 引用对象的方法的名称字符串
-// 以上两种用法从第三个参数开始可以为调用函数传入若干个参数
-// 如果该函数本身就有默认参数，比如 .each() 方法会给函数传入两个参数，分别为索引号和对应的对象，那么通过代理设置的参数会插在原函数的参数前
-var guid = 0;
-function proxy(func, target) {
-    if (typeof target === 'string') {
-        var tmp = func[target];
-        target = func;
-        func = tmp;
-    }
-
-    if (typeof func !== 'function') {
-        return undefined;
-    }
-
-    var slice = Array.prototype.slice,
-        args = slice.call(arguments, 2),
-        proxy = function proxy() {
-        return func.apply(target || this, args.concat(slice.call(arguments)));
-    };
-
-    proxy.guid = func.guid = func.guid || guid++;
-
-    return proxy;
-}
-
 function css(elem, prop, value) {
     if ((typeof prop === 'undefined' ? 'undefined' : _typeof(prop)) === 'object') {
         for (var p in prop) {
@@ -176,160 +159,164 @@ function css(elem, prop, value) {
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports) {
+
+module.exports = function(context, ...methods) {
+    methods.forEach(method => {
+        context[method] = context[method].bind(context);
+    });
+}
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
- * mainLoop v1.0.2
- * (c) 2014-2017 BaiJunjie
+ * mainloop v1.0.3
+ * (c) 2014-2018 BaiJunjie
  * MIT Licensed.
  *
- * https://github.com/baijunjie/mainLoop.js
+ * https://github.com/baijunjie/mainloop
  */
 (function(root, factory) {
-	'use strict';
+    'use strict';
 
-	if (true) {
-		module.exports = factory();
-	} else {}
+    if (true) {
+        module.exports = factory();
+    } else {}
 
 }(this, function() {
-	'use strict';
+    'use strict';
 
-	var requestAnimationFrame = window.requestAnimationFrame,
-		cancelAnimationFrame = window.cancelAnimationFrame,
-		vendors = ['ms', 'moz', 'webkit', 'o'];
+    var requestAnimationFrame = window.requestAnimationFrame,
+        cancelAnimationFrame = window.cancelAnimationFrame,
+        vendors = ['ms', 'moz', 'webkit', 'o'];
 
-	for (var x = 0; x < vendors.length && !requestAnimationFrame; ++x) {
-		requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
-		cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
-	}
+    for (var x = 0; x < vendors.length && !requestAnimationFrame; ++x) {
+        requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+        cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+    }
 
-	if (!cancelAnimationFrame) {
-		cancelAnimationFrame = function(id) {
-			window.clearTimeout(id);
-		};
-	}
+    if (!cancelAnimationFrame) {
+        cancelAnimationFrame = function(id) {
+            window.clearTimeout(id);
+        };
+    }
 
-	function Loop() {
-		this._requestAnimationFrame = requestAnimationFrame;
+    function Loop() {
+        this._requestAnimationFrame = requestAnimationFrame;
 
-		if (!this._requestAnimationFrame) {
-			var lastTime = 0;
-			this._requestAnimationFrame = function(callback) {
-				var currTime = new Date().getTime(),
-					timeToCall = Math.max(0, 16 - (currTime - lastTime)),
-					id = window.setTimeout(function() {
-						callback(currTime + timeToCall);
-					}, timeToCall);
-				lastTime = currTime + timeToCall;
-				return id;
-			};
-		}
+        if (!this._requestAnimationFrame) {
+            var lastTime = 0;
+            this._requestAnimationFrame = function(callback) {
+                var currTime = new Date().getTime(),
+                    timeToCall = Math.max(0, 16 - (currTime - lastTime)),
+                    id = window.setTimeout(function() {
+                        callback(currTime + timeToCall);
+                    }, timeToCall);
+                lastTime = currTime + timeToCall;
+                return id;
+            };
+        }
 
-		this._runFunc = []; //储存所有循环中运行的方法
-		this._active = !!this._runFunc.length; //表示循环是否在激活状态。当循环中存在需要运行的方法时，则被判定为激活状态
-		this._isRun = true; //表示循环是否在运行状态
-		this._timerID = 0;
-		this._loopCallback = proxy(this._loopCallback, this);
-	}
+        this._runFunc = []; //储存所有循环中运行的方法
+        this._active = !!this._runFunc.length; //表示循环是否在激活状态。当循环中存在需要运行的方法时，则被判定为激活状态
+        this._isRun = true; //表示循环是否在运行状态
+        this._timerID = 0;
+        this._loopCallback = proxy(this._loopCallback, this);
+    }
 
-	Loop.prototype = {
-		_loopCallback: function() {
-			var i = this._runFunc.length;
-			while (i--) {
-				if (this._runFunc[i]() === false) { // 如果方法返回 false，则将该方法移出循环
-					this._runFunc.splice(i, 1);
-				}
-			}
+    Loop.prototype = {
+        _loopCallback: function() {
+            var i = this._runFunc.length;
+            while (i--) {
+                if (this._runFunc[i]() === false) { // 如果方法返回 false，则将该方法移出循环
+                    this._runFunc.splice(i, 1);
+                }
+            }
 
-			if (this._runFunc.length) {
-				this._timerID = this._requestAnimationFrame.call(window, this._loopCallback);
-			} else {
-				this._active = false;
-			}
-		},
+            if (this._runFunc.length) {
+                this._timerID = this._requestAnimationFrame.call(window, this._loopCallback);
+            } else {
+                this._active = false;
+            }
+        },
 
-		add: function(func, target) {
-			if (typeof func !== 'function') return this;
-			if (target) {
-				func = proxy(func, target);
-			}
-			this._runFunc.unshift(func);
+        add: function(func, target) {
+            if (typeof func !== 'function') return this;
+            if (target) {
+                func = proxy(func, target);
+            }
+            this._runFunc.unshift(func);
 
-			if (this._active) return this;
-			this._active = true;
-			if (this._isRun) {
-				this._timerID = this._requestAnimationFrame.call(window, this._loopCallback);
-			}
-			return this;
-		},
+            if (this._active) return this;
+            this._active = true;
+            if (this._isRun) {
+                this._timerID = this._requestAnimationFrame.call(window, this._loopCallback);
+            }
+            return this;
+        },
 
-		remove: function(func) {
-			if (typeof func !== 'function') {
-				this._runFunc = [];
-				return this;
-			}
-			var i = this._runFunc.length;
-			while (i--) {
-				if (this._runFunc[i].guid === func.guid) {
-					this._runFunc.splice(i, 1);
-					return this;
-				}
-			}
-		},
+        remove: function(func) {
+            if (typeof func !== 'function') {
+                this._runFunc = [];
+                return this;
+            }
+            var i = this._runFunc.length;
+            while (i--) {
+                if (this._runFunc[i].guid === func.guid) {
+                    this._runFunc.splice(i, 1);
+                    return this;
+                }
+            }
+        },
 
-		stop: function() { // 停止循环
-			if (!this._isRun) return this;
-			this._isRun = false;
-			cancelAnimationFrame(this._timerID);
-			return this;
-		},
+        stop: function() { // 停止循环
+            if (!this._isRun) return this;
+            this._isRun = false;
+            cancelAnimationFrame(this._timerID);
+            return this;
+        },
 
-		play: function() { // 启动循环
-			if (this._isRun) return this;
-			this._isRun = true;
-			if (this._active) {
-				this._timerID = this._requestAnimationFrame.call(window, this._loopCallback);
-			}
-			return this;
-		}
-	};
+        play: function() { // 启动循环
+            if (this._isRun) return this;
+            this._isRun = true;
+            if (this._active) {
+                this._timerID = this._requestAnimationFrame.call(window, this._loopCallback);
+            }
+            return this;
+        }
+    };
 
-	var guid = 0;
-	function proxy(func, target) {
-		if (typeof target === 'string') {
-			var tmp = func[target];
-			target = func;
-			func = tmp;
-		}
+    var guid = 0;
+    function proxy(func, target) {
+        if (typeof target === 'string') {
+            var tmp = func[target];
+            target = func;
+            func = tmp;
+        }
 
-		if (typeof func !== 'function') {
-			return undefined;
-		}
+        if (typeof func !== 'function') {
+            return undefined;
+        }
 
-		var slice = Array.prototype.slice,
-			args = slice.call(arguments, 2),
-			proxy = function() {
-				return func.apply(target || this, args.concat(slice.call(arguments)));
-			};
+        var slice = Array.prototype.slice,
+            args = slice.call(arguments, 2),
+            proxy = function() {
+                return func.apply(target || this, args.concat(slice.call(arguments)));
+            };
 
-		proxy.guid = func.guid = func.guid || guid++;
+        proxy.guid = func.guid = func.guid || guid++;
 
-		return proxy;
-	}
+        return proxy;
+    }
 
-	var loop = new Loop();
-	loop.createLoop = function() {
-		return new Loop();
-	};
-
-	return loop;
-
+    return new Loop();
 }));
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -341,9 +328,13 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _mainloop = __webpack_require__(1);
+var _mainloop = __webpack_require__(2);
 
 var _mainloop2 = _interopRequireDefault(_mainloop);
+
+var _bind = __webpack_require__(1);
+
+var _bind2 = _interopRequireDefault(_bind);
 
 var _utils = __webpack_require__(0);
 
@@ -380,10 +371,10 @@ var Progress = function () {
             this._timerID = 0; // 用于记录hide动画使用的计时器ID
             this._stepCallback = function () {};
 
+            (0, _bind2.default)(this, '_loadedHandle', '_addDocument');
+
             this._createElem();
             this.color(color || '#000');
-
-            this._loadedHandle = (0, _utils.proxy)(this._loadedHandle, this);
 
             if (document.readyState !== 'complete') {
                 this.start();
@@ -438,7 +429,6 @@ var Progress = function () {
             this._progress.appendChild(this._progressHeadLeft);
             this._progress.appendChild(this._progressHeadRight);
 
-            this._addDocument = (0, _utils.proxy)(this._addDocument, this);
             this._addDocument();
         }
     }, {
@@ -676,7 +666,7 @@ var Progress = function () {
                     _this._timerID = setTimeout(function () {
                         _this._timerID = 0;
                         _this._fadeOutCallback();
-                    }, duration);
+                    }, 100000);
                 } else {
                     (0, _utils.css)(elem, 'display', 'none');
                     callback && callback.call(_this);
